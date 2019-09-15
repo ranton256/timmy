@@ -3,6 +3,7 @@ from random import randint
 
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
+# TODO: setup a remote server Git repo
 
 player = Actor("player", (400, 550))
 boss = Actor("boss")
