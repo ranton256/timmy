@@ -10,6 +10,10 @@ boss = Actor("boss")
 gameStatus = 0
 highScore = []
 
+# These control the width in Pygame zero.
+WIDTH = 800
+HEIGHT = 600
+
 
 def draw():  # Pygame Zero draw function
     screen.blit('background', (0, 0))
@@ -131,19 +135,23 @@ def draw_high_score():
 
 
 def draw_lives():
-    for l in range(player.lives): screen.blit("life", (10 + (l * 32), 10))
+    for l in range(player.lives):
+        screen.blit("life", (10 + (l * 32), 10))
 
 
 def draw_aliens():
-    for a in range(len(aliens)): aliens[a].draw()
+    for a in range(len(aliens)):
+        aliens[a].draw()
 
 
 def draw_bases():
-    for b in range(len(bases)): bases[b].drawClipped()
+    for b in range(len(bases)):
+        bases[b].drawClipped()
 
 
 def draw_lasers():
-    for l in range(len(lasers)): lasers[l].draw()
+    for l in range(len(lasers)):
+        lasers[l].draw()
 
 
 def check_keys():

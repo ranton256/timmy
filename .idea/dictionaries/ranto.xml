@@ -2,6 +2,7 @@
   <dictionary name="ranto">
     <words>
       <w>highscores</w>
+      <w>pygame</w>
     </words>
   </dictionary>
 </component>
