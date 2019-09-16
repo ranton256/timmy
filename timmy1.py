@@ -6,6 +6,7 @@ from random import randint
 # TODO: setup a remote server Git repo
 
 player = Actor("player", (400, 550))
+# TODO: put back boss
 boss = Actor("boss")
 gameStatus = 0
 highScore = []
@@ -136,7 +137,7 @@ def draw_high_score():
 
 def draw_lives():
     for l in range(player.lives):
-        screen.blit("life", (10 + (l * 32), 10))
+        screen.blit("timmy_life", (10 + (l * 32), 10))
 
 
 def draw_aliens():
@@ -165,7 +166,7 @@ def check_keys():
             sounds.gun.play()
             player.laserActive = 0
             clock.schedule(make_laser_active, 1.0)
-            lasers.append(Actor("laser2", (player.x, player.y - 32)))
+            lasers.append(Actor("pellet", (player.x, player.y - 16))) # was 32
             lasers[len(lasers) - 1].status = 0
             lasers[len(lasers) - 1].type = 1
             score -= 100
@@ -245,11 +246,11 @@ def update_aliens():
     for a in range(len(aliens)):
         animate(aliens[a], pos=(aliens[a].x + movex, aliens[a].y + movey), duration=0.5, tween='linear')
         if randint(0, 1) == 0:
-            aliens[a].image = "alien1"
+            aliens[a].image = "batframe1"
         else:
-            aliens[a].image = "alien1b"
+            aliens[a].image = "batframe2"
             if randint(0, 5) == 0:
-                lasers.append(Actor("laser1", (aliens[a].x, aliens[a].y)))
+                lasers.append(Actor("batrock", (aliens[a].x, aliens[a].y)))
                 lasers[len(lasers) - 1].status = 0
                 lasers[len(lasers) - 1].type = 0
                 sounds.laser.play()
@@ -276,15 +277,19 @@ def update_boss():
             player.status = 1
             boss.active = False
         if randint(0, 30) == 0:
-            lasers.append(Actor("laser1", (boss.x, boss.y)))
+            lasers.append(Actor("batrock", (boss.x, boss.y)))
             lasers[len(lasers) - 1].status = 0
             lasers[len(lasers) - 1].type = 0
     else:
+        pass
+        """ TODO: for right now the boss is disabled. """
+        """
         if randint(0, 800) == 0:
             boss.active = True
             boss.x = 800
             boss.y = 100
             boss.direction = 0
+        """
 
 
 def init():
@@ -295,7 +300,8 @@ def init():
     lasers = []
     moveDelay = 30
     boss.active = False
-    player.images = ["player", "explosion1", "explosion2", "explosion3", "explosion4", "explosion5"]
+    # player.images = ["player", "explosion1", "explosion2", "explosion3", "explosion4", "explosion5"]
+    player.images = ["timmy", "explosion1", "explosion2", "explosion3", "explosion4", "explosion5"]
     player.laserActive = 1
     player.lives = 3
     player.name = ""
@@ -307,7 +313,7 @@ def init_aliens():
     aliens = []
     moveCounter = moveSequence = 0
     for a in range(18):
-        aliens.append(Actor("alien1", (210 + (a % 6) * 80, 100 + (int(a / 6) * 64))))
+        aliens.append(Actor("batframe1", (210 + (a % 6) * 80, 100 + (int(a / 6) * 64))))
         aliens[a].status = 0
 
 
@@ -330,7 +336,7 @@ def init_bases():
     bc = 0
     for b in range(3):
         for p in range(3):
-            bases.append(Actor("base1", midbottom=(150 + (b * 200) + (p * 40), 520)))
+            bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 40), 520)))
             bases[bc].drawClipped = draw_clipped.__get__(bases[bc])
             bases[bc].collideLaser = collideLaser.__get__(bases[bc])
             bases[bc].height = 60
