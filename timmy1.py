@@ -1,29 +1,47 @@
 import pgzrun, math, re, time
 from random import randint
+import enum
 
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
 # TODO: setup a remote server Git repo
 
+
+class GameStatus(enum.Enum):
+    start = 0
+    playing = 1
+    over = 2
+
+
 player = Actor("player", (400, 550))
 # TODO: put back boss
 boss = Actor("boss")
-gameStatus = 0
+gameStatus = GameStatus.start
 highScore = []
+moveCounter = 0
 
 # These control the width in Pygame zero.
 WIDTH = 800
 HEIGHT = 600
 
+PLAYER_MARGIN = 40
+
+
+def MAX(a,b):
+    if a > b:
+        return a
+    else:
+        return b
+
 
 def draw():  # Pygame Zero draw function
     screen.blit('background', (0, 0))
-    if gameStatus == 0:  # display the title page
+    if gameStatus == GameStatus.start:
         draw_centre_text(
-            "PYGAME ZERO INVADERS\n\n\nType your name then\npress Enter to start\n(arrow keys move, space to fire)")
+            "Timmy, Cave Dweller\n\n\nType your name then\nPress Enter to start\nArrow keys move. Space fires.")
         screen.draw.text(player.name, center=(400, 500), owidth=0.5, ocolor=(255, 0, 0), color=(0, 64, 255),
                          fontsize=60)
-    if gameStatus == 1:  # playing the game
+    if gameStatus == GameStatus.playing:
         player.image = player.images[math.floor(player.status / 6)]
         player.draw()
         if boss.active:
@@ -31,9 +49,9 @@ def draw():  # Pygame Zero draw function
         draw_lasers()
         draw_aliens()
         draw_bases()
-        screen.draw.text(str(score), topright=(780, 10), owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
+        screen.draw.text(str(score), topright=(WIDTH-20, 10), owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
                          fontsize=60)
-        screen.draw.text("LEVEL " + str(level), midtop=(400, 10), owidth=0.5, ocolor=(255, 255, 255),
+        screen.draw.text("LEVEL " + str(level), midtop=(WIDTH/2, 10), owidth=0.5, ocolor=(255, 255, 255),
                          color=(0, 64, 255), fontsize=60)
         draw_lives()
         if player.status >= 30:
@@ -43,18 +61,19 @@ def draw():  # Pygame Zero draw function
                 draw_centre_text("GAME OVER!\nPress Enter to continue")
         if len(aliens) == 0:
             draw_centre_text("LEVEL CLEARED!\nPress Enter to go to the next level")
-    if gameStatus == 2:  # game over show the leaderboard
+    if gameStatus == GameStatus.over:
         draw_high_score()
 
 
 def draw_centre_text(t):
-    screen.draw.text(t, center=(400, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
+    screen.draw.text(t, center=(WIDTH/2, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
+
 
 def update():  # Pygame Zero update function
     global moveCounter, player, gameStatus, lasers, level, boss
-    if gameStatus == 0:
-        if keyboard.RETURN and player.name != "": gameStatus = 1
-    if gameStatus == 1:
+    if gameStatus == GameStatus.start:
+        if keyboard.RETURN and player.name != "": gameStatus = GameStatus.playing
+    if gameStatus == GameStatus.playing:
         if player.status < 30 and len(aliens) > 0:
             check_keys()
             update_lasers()
@@ -78,9 +97,9 @@ def update():  # Pygame Zero update function
                         init_bases()
                 else:
                     read_high_score()
-                    gameStatus = 2
+                    gameStatus = GameStatus.over
                     write_high_score()
-    if gameStatus == 2:
+    if gameStatus == GameStatus.over:
         if keyboard.ESCAPE:
             init()
             gameStatus = 0
@@ -88,7 +107,7 @@ def update():  # Pygame Zero update function
 
 def on_key_down(key):
     global player
-    if gameStatus == 0 and key.name != "RETURN":
+    if gameStatus == gameStatus.start and key.name != "RETURN":
         if len(key.name) == 1:
             player.name += key.name
         else:
@@ -124,14 +143,14 @@ def write_high_score():
 def draw_high_score():
     global highScore
     y = 0
-    screen.draw.text("TOP SCORES", midtop=(400, 30), owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
+    screen.draw.text("TOP SCORES", midtop=(WIDTH/2, 30), owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
                      fontsize=60)
     for line in highScore:
         if y < 400:
-            screen.draw.text(line, midtop=(400, 100 + y), owidth=0.5, ocolor=(0, 0, 255), color=(255, 255, 0),
+            screen.draw.text(line, midtop=(WIDTH/2, 100 + y), owidth=0.5, ocolor=(0, 0, 255), color=(255, 255, 0),
                              fontsize=50)
             y += 50
-    screen.draw.text("Press Escape to play again", center=(400, 550), owidth=0.5, ocolor=(255, 255, 255),
+    screen.draw.text("Press Escape to play again", center=(WIDTH/2, 550), owidth=0.5, ocolor=(255, 255, 255),
                      color=(255, 64, 0), fontsize=60)
 
 
@@ -158,9 +177,9 @@ def draw_lasers():
 def check_keys():
     global player, score
     if keyboard.left:
-        if player.x > 40: player.x -= 5
+        if player.x > PLAYER_MARGIN: player.x -= 5
     if keyboard.right:
-        if player.x < 760: player.x += 5
+        if player.x < (WIDTH - PLAYER_MARGIN): player.x += 5
     if keyboard.space:
         if player.laserActive == 1:
             sounds.gun.play()
@@ -169,7 +188,7 @@ def check_keys():
             lasers.append(Actor("pellet", (player.x, player.y - 16))) # was 32
             lasers[len(lasers) - 1].status = 0
             lasers[len(lasers) - 1].type = 1
-            score -= 100
+            score = MAX(score - 100, 0)
 
 
 def make_laser_active():
@@ -191,7 +210,7 @@ def update_lasers():
         if lasers[l].type == 0:
             lasers[l].y += 2
             check_laser_hit(l)
-            if lasers[l].y > 600: lasers[l].status = 1
+            if lasers[l].y > 600: lasers[l].status = 1  # TODO: constant for height
         if lasers[l].type == 1:
             lasers[l].y -= 5
             check_player_laser_hit(l)
@@ -215,7 +234,7 @@ def check_laser_hit(l):
         lasers[l].status = 1
     for b in range(len(bases)):
         if bases[b].collideLaser(lasers[l]):
-            bases[b].height -= 10
+            bases[b].height -= 10  # TODO: height constant
             lasers[l].status = 1
 
 
@@ -242,7 +261,8 @@ def update_aliens():
     if moveSequence == 10 or moveSequence == 30:
         movey = 40 + (5 * level)
         moveDelay -= 1
-    if moveSequence > 10 and moveSequence < 30: movex = 15
+    if moveSequence > 10 and moveSequence < 30:
+        movex = 15
     for a in range(len(aliens)):
         animate(aliens[a], pos=(aliens[a].x + movex, aliens[a].y + movey), duration=0.5, tween='linear')
         if randint(0, 1) == 0:
@@ -270,6 +290,7 @@ def update_boss():
             boss.x -= (1 * level)
         else:
             boss.x += (1 * level)
+        # TODO: need constants
         if boss.x < 100: boss.direction = 1
         if boss.x > 700: boss.direction = 0
         if boss.y > 500:
@@ -284,9 +305,9 @@ def update_boss():
         pass
         """ TODO: for right now the boss is disabled. """
         """
-        if randint(0, 800) == 0:
+        if randint(0, WIDTH) == 0:
             boss.active = True
-            boss.x = 800
+            boss.x = WIDTH
             boss.y = 100
             boss.direction = 0
         """
@@ -313,6 +334,7 @@ def init_aliens():
     aliens = []
     moveCounter = moveSequence = 0
     for a in range(18):
+        # TODO: OMG Constants!
         aliens.append(Actor("batframe1", (210 + (a % 6) * 80, 100 + (int(a / 6) * 64))))
         aliens[a].status = 0
 
@@ -322,6 +344,7 @@ def draw_clipped(self):
 
 
 def collideLaser(self, other):
+    # TODO: constants, or better yet widths/heights of objects.
     return (
             self.x - 20 < other.x + 5 and
             self.y - self.height + 30 < other.y and
@@ -336,6 +359,7 @@ def init_bases():
     bc = 0
     for b in range(3):
         for p in range(3):
+            # TODO: fix this to clip from top.
             bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 40), 520)))
             bases[bc].drawClipped = draw_clipped.__get__(bases[bc])
             bases[bc].collideLaser = collideLaser.__get__(bases[bc])
