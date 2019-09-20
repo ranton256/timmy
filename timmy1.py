@@ -6,6 +6,12 @@ import enum
 # TODO: clean this all up to have fewer magic numbers and globals
 # TODO: setup a remote server Git repo
 
+# TODO: need better Timmy sprite
+# TODO: need sensible death animation
+# TODO: need cavern themed background image.
+# TODO: replace or remove boss code.
+# TODO: remove unused images.
+
 
 class GameStatus(enum.Enum):
     start = 0
@@ -19,6 +25,9 @@ boss = Actor("boss")
 gameStatus = GameStatus.start
 highScore = []
 moveCounter = 0
+score = 0
+lasers = []
+level = 1
 
 # These control the width in Pygame zero.
 WIDTH = 800
@@ -107,7 +116,7 @@ def update():  # Pygame Zero update function
 
 def on_key_down(key):
     global player
-    if gameStatus == gameStatus.start and key.name != "RETURN":
+    if gameStatus == GameStatus.start and key.name != "RETURN":
         if len(key.name) == 1:
             player.name += key.name
         else:
@@ -125,6 +134,9 @@ def read_high_score():
     except:
         print("Unable to read high scores file!")
         pass
+    finally:
+        hsFile.close()
+
     highScore.append(str(score) + " " + player.name)
     highScore.sort(key=natural_key, reverse=True)
 
