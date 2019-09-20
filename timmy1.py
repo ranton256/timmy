@@ -150,6 +150,7 @@ def write_high_score():
     hsFile = open("highscores.txt", "w")
     for line in highScore:
         hsFile.write(line + "\n")
+    hsFile.close()
 
 
 def draw_high_score():
