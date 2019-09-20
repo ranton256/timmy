@@ -19,7 +19,7 @@ class GameStatus(enum.Enum):
     over = 2
 
 
-player = Actor("player", (400, 550))
+player = Actor("timmy", (400, 550))
 # TODO: put back boss
 boss = Actor("boss")
 gameStatus = GameStatus.start
@@ -333,8 +333,7 @@ def init():
     lasers = []
     moveDelay = 30
     boss.active = False
-    # player.images = ["player", "explosion1", "explosion2", "explosion3", "explosion4", "explosion5"]
-    player.images = ["timmy", "explosion1", "explosion2", "explosion3", "explosion4", "explosion5"]
+    player.images = ["timmy", "death1", "death2", "death3", "death4", "death5"]
     player.laserActive = 1
     player.lives = 3
     player.name = ""
