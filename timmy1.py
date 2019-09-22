@@ -195,7 +195,7 @@ def check_keys():
         if player.x < (WIDTH - PLAYER_MARGIN): player.x += 5
     if keyboard.space:
         if player.laserActive == 1:
-            sounds.gun.play()
+            sounds.pellet.play()
             player.laserActive = 0
             clock.schedule(make_laser_active, 1.0)
             lasers.append(Actor("pellet", (player.x, player.y - 16))) # was 32
@@ -242,7 +242,7 @@ def list_cleanup(l):
 def check_laser_hit(l):
     global player
     if player.collidepoint((lasers[l].x, lasers[l].y)):
-        sounds.explosion.play()
+        sounds.death.play()
         player.status = 1
         lasers[l].status = 1
     # Why are we checking this here and in check_player_laser_hit?
@@ -287,7 +287,7 @@ def update_aliens():
                 lasers.append(Actor("batrock", (aliens[a].x, aliens[a].y)))
                 lasers[len(lasers) - 1].status = 0
                 lasers[len(lasers) - 1].type = 0
-                sounds.laser.play()
+                sounds.batdrop.play()
         if aliens[a].y > 500 and player.status == 0:
             sounds.explosion.play()
             player.status = 1
@@ -338,8 +338,9 @@ def init():
     level = 1
 
     # TODO: testing tone generation.
-    pellet_tone = tone.create(2000, 0.5)
-    pellet_tone.play()
+    # pellet_tone = tone.create(2000, 0.5)
+    #pellet_tone.play()
+
 
     music.play("mystical_caverns")
 
