@@ -179,7 +179,7 @@ def draw_aliens():
 
 def draw_bases():
     for b in range(len(bases)):
-        bases[b].drawClipped()
+        draw_clipped(bases[b])
 
 
 def draw_lasers():
@@ -247,7 +247,7 @@ def check_laser_hit(l):
         lasers[l].status = 1
     # Why are we checking this here and in check_player_laser_hit?
     for b in range(len(bases)):
-        if bases[b].collideLaser(lasers[l]):
+        if collide_base_with_laser(bases[b], lasers[l]):
             bases[b].height -= 10  # TODO: height constant
             lasers[l].status = 1
 
@@ -255,7 +255,8 @@ def check_laser_hit(l):
 def check_player_laser_hit(l):
     global score, boss
     for b in range(len(bases)):
-        if bases[b].collideLaser(lasers[l]): lasers[l].status = 1
+        if collide_base_with_laser(bases[b], lasers[l]):
+            lasers[l].status = 1
     for a in range(len(aliens)):
         if aliens[a].collidepoint((lasers[l].x, lasers[l].y)):
             lasers[l].status = 1
@@ -337,9 +338,9 @@ def init():
     player.name = ""
     level = 1
 
-    # TODO: testing tone generation.
+    # For testing tone generation.
     # pellet_tone = tone.create(2000, 0.5)
-    #pellet_tone.play()
+    # pellet_tone.play()
 
 
     music.play("mystical_caverns")
@@ -358,14 +359,8 @@ def draw_clipped(self):
     screen.surface.blit(self._surf, (self.x - 32, self.y - self.height), (0, 0, 64, self.height))
 
 
-def collideLaser(self, other):
-    # TODO: constants, or better yet widths/heights of objects.
-    return (
-            self.x - 20 < other.x + 5 and
-            self.y - self.height + 30 < other.y and
-            self.x + 32 > other.x + 5 and
-            self.y - self.height + 30 + self.height > other.y
-    )
+def collide_base_with_laser(base, other):
+    return base.colliderect(other)
 
 
 def init_bases():
@@ -375,8 +370,6 @@ def init_bases():
     for b in range(3):
         for p in range(3):
             bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 40), 520)))
-            bases[bc].drawClipped = draw_clipped.__get__(bases[bc])
-            bases[bc].collideLaser = collideLaser.__get__(bases[bc])
             bases[bc].height = 44
             bc += 1
 
