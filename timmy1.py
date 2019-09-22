@@ -262,11 +262,12 @@ def check_player_laser_hit(l):
 def update_aliens():
     global moveSequence, lasers, moveDelay
     movex = movey = 0
-    if moveSequence < 10 or moveSequence > 30: movex = -15
+    if moveSequence < 10 or moveSequence > 30:
+        movex = -15
     if moveSequence == 10 or moveSequence == 30:
         movey = 40 + (5 * level)
         moveDelay -= 1
-    if moveSequence > 10 and moveSequence < 30:
+    if 10 < moveSequence < 30:
         movex = 15
     for a in range(len(aliens)):
         animate(aliens[a], pos=(aliens[a].x + movex, aliens[a].y + movey), duration=0.5, tween='linear')
