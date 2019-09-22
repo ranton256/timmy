@@ -4,8 +4,7 @@ import enum
 
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
-# TODO: setup a remote server Git repo
-# TODO: need cavern themed background image.
+# TODO: Fix the "base" rocks to use texture that matches background better.
 
 
 class GameStatus(enum.Enum):
@@ -30,7 +29,7 @@ PLAYER_MARGIN = 40
 
 
 def draw():
-    screen.blit('background', (0, 0))
+    screen.blit('cave', (0, 0))
     if gameStatus == GameStatus.start:
         draw_centre_text(
             "Timmy, Cave Dweller\n\n\nType your name then\nPress Enter to start\nArrow keys move. Space fires.")
