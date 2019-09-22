@@ -8,6 +8,7 @@ import enum
 
 # TODO: need cavern themed background image.
 # TODO: replace or remove boss code.
+# TODO: fix the wonky base positioning bug.
 
 
 class GameStatus(enum.Enum):
@@ -18,7 +19,7 @@ class GameStatus(enum.Enum):
 
 player = Actor("timmy", (400, 550))
 # TODO: put back boss
-boss = Actor("boss")
+boss = Actor("spider")
 gameStatus = GameStatus.start
 highScore = []
 moveCounter = 0
@@ -111,7 +112,7 @@ def update():
     if gameStatus == GameStatus.over:
         if keyboard.ESCAPE:
             init()
-            gameStatus = 0
+            gameStatus = GameStatus.start
 
 
 def on_key_down(key):
@@ -314,15 +315,11 @@ def update_boss():
             lasers[len(lasers) - 1].status = 0
             lasers[len(lasers) - 1].type = 0
     else:
-        pass
-        """ TODO: for right now the boss is disabled. """
-        """
         if randint(0, WIDTH) == 0:
             boss.active = True
             boss.x = WIDTH
             boss.y = 100
             boss.direction = 0
-        """
 
 
 def init():
