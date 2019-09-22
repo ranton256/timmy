@@ -5,10 +5,7 @@ import enum
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
 # TODO: setup a remote server Git repo
-
 # TODO: need cavern themed background image.
-# TODO: replace or remove boss code.
-# TODO: fix the wonky base positioning bug.
 
 
 class GameStatus(enum.Enum):
