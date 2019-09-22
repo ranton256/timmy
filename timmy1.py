@@ -169,7 +169,7 @@ def draw_aliens():
 
 def draw_bases():
     for b in range(len(bases)):
-        draw_clipped(bases[b])
+        bases[b].draw_clipped()
 
 
 def draw_lasers():
@@ -238,7 +238,7 @@ def check_laser_hit(l):
     # Why are we checking this here and in check_player_laser_hit?
     for b in range(len(bases)):
         if collide_base_with_laser(bases[b], lasers[l]):
-            bases[b].height -= 10  # TODO: height constant
+            bases[b].height = max(bases[b].height - 10, 0)
             lasers[l].status = 1
 
 
@@ -346,7 +346,10 @@ def init_aliens():
 
 
 def draw_clipped(self):
-    screen.surface.blit(self._surf, (self.x - 32, self.y - self.height), (0, 0, 64, self.height))
+    left = self.x -32
+    top = self.y - self.height
+    r = (0, 0, self.width, self.height)
+    screen.surface.blit(self._surf, (left, top), r)
 
 
 def collide_base_with_laser(base, other):
@@ -360,7 +363,9 @@ def init_bases():
     for b in range(3):
         for p in range(3):
             bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 40), 520)))
+            bases[bc].draw_clipped = draw_clipped.__get__(bases[bc])
             bases[bc].height = 44
+            bases[bc].original_height = bases[bc].height
             bc += 1
 
 
