@@ -6,7 +6,6 @@ import enum
 # TODO: clean this all up to have fewer magic numbers and globals
 # TODO: Fix the "base" rocks to use texture that matches background better.
 # TODO: add ability to pause.
-# BUG: bases are still stopping things after they should be gone.
 # TODO: better pellet graphic and intersection.
 # TODO: refactor to use objects for state instead of globals
 
@@ -85,6 +84,7 @@ def update():
             check_keys()
             update_lasers()
             update_boss()
+            check_bases()
             if moveCounter == 0:
                 update_aliens()
             moveCounter += 1
@@ -208,12 +208,11 @@ def make_laser_active():
 
 
 def check_bases():
+    global bases
     for b in range(len(bases)):
-        # original: if l < len(bases):
-        if b < len(bases):
-            if bases[b].height < 5:
-                del bases[b]
-
+        if bases[b].height == 0:
+            bases[b].status = DEAD
+    bases = list_cleanup(bases)
 
 def update_lasers():
     global lasers, aliens
@@ -246,11 +245,11 @@ def check_laser_hit(l):
         sounds.death.play()
         player.status = DEAD
         lasers[l].status = DEAD
-    # Why are we checking this here and in check_player_laser_hit?
     for b in range(len(bases)):
         if collide_base_with_laser(bases[b], lasers[l]):
             bases[b].height = max(bases[b].height - 10, 0)
             lasers[l].status = DEAD
+
 
 
 def check_player_laser_hit(l):
@@ -348,6 +347,7 @@ def init():
 
     music.play("mystical_caverns")
 
+
 def init_aliens():
     global aliens, moveCounter, moveSequence
     aliens = []
@@ -379,6 +379,7 @@ def init_bases():
             bases[bc].draw_clipped = draw_clipped.__get__(bases[bc])
             bases[bc].height = 44
             bases[bc].original_height = bases[bc].height
+            bases[bc].status = ALIVE
             bc += 1
 
 
