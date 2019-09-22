@@ -17,6 +17,7 @@ class GameStatus(enum.Enum):
     over = 2
 
 
+
 player = Actor("timmy", (400, 550))
 # TODO: put back boss
 boss = Actor("spider")
@@ -336,6 +337,11 @@ def init():
     player.name = ""
     level = 1
 
+    # TODO: testing tone generation.
+    pellet_tone = tone.create(2000, 0.5)
+    pellet_tone.play()
+
+    music.play("mystical_caverns")
 
 def init_aliens():
     global aliens, moveCounter, moveSequence
