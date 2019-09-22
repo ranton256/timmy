@@ -17,9 +17,7 @@ class GameStatus(enum.Enum):
     over = 2
 
 
-
 player = Actor("timmy", (400, 550))
-# TODO: put back boss
 boss = Actor("spider")
 gameStatus = GameStatus.start
 highScore = []
@@ -31,15 +29,7 @@ level = 1
 # These control the width in Pygame zero.
 WIDTH = 800
 HEIGHT = 600
-
 PLAYER_MARGIN = 40
-
-
-def MAX(a,b):
-    if a > b:
-        return a
-    else:
-        return b
 
 
 def draw():
@@ -201,7 +191,7 @@ def check_keys():
             lasers.append(Actor("pellet", (player.x, player.y - 16))) # was 32
             lasers[len(lasers) - 1].status = 0
             lasers[len(lasers) - 1].type = 1
-            score = MAX(score - 100, 0)
+            score = max(score - 100, 0)
 
 
 def make_laser_active():
