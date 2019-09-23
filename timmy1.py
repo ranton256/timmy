@@ -1,6 +1,7 @@
-import pgzrun, math, re, time
+import pgzrun, math, time
 from random import randint
 import enum
+from high_scores import HighScores
 
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
@@ -31,6 +32,8 @@ HEIGHT = 600
 PLAYER_MARGIN = 40
 
 ENEMY_MOVE_DELAY = 30
+
+HIGH_SCORES_PATH = "highscores.txt"
 
 # These are actor status values.
 ALIVE = 0
@@ -76,7 +79,7 @@ def draw_centre_text(t):
 
 
 def update():
-    global moveCounter, player, gameStatus, lasers, level, boss
+    global moveCounter, player, gameStatus, lasers, level, boss, highScore
     if gameStatus == GameStatus.start:
         if keyboard.RETURN and player.name != "": gameStatus = GameStatus.playing
     if gameStatus == GameStatus.playing:
@@ -105,9 +108,13 @@ def update():
                         init_aliens()
                         init_bases()
                 else:
-                    read_high_score()
+                    scores = HighScores()
+                    scores.read_from_file(HIGH_SCORES_PATH)
+                    scores.add_score(player.name, score)
+                    scores.write_to_file(HIGH_SCORES_PATH)
+                    highScore = scores.get_scores()
                     gameStatus = GameStatus.over
-                    write_high_score()
+
     if gameStatus == GameStatus.over:
         if keyboard.ESCAPE:
             init()
@@ -122,35 +129,6 @@ def on_key_down(key):
         else:
             if key.name == "BACKSPACE":
                 player.name = player.name[:-1]
-
-
-def read_high_score():
-    global highScore, score, player
-    highScore = []
-    try:
-        hsFile = open("highscores.txt", "r")
-        for line in hsFile:
-            highScore.append(line.rstrip())
-    except:
-        print("Unable to read high scores file!")
-        pass
-    finally:
-        hsFile.close()
-
-    highScore.append(str(score) + " " + player.name)
-    highScore.sort(key=natural_key, reverse=True)
-
-
-def natural_key(string_):
-    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
-
-
-def write_high_score():
-    global highScore
-    hsFile = open("highscores.txt", "w")
-    for line in highScore:
-        hsFile.write(line + "\n")
-    hsFile.close()
 
 
 def draw_high_score():
