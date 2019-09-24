@@ -1,4 +1,6 @@
 import pgzrun, math, time
+import pygame
+
 from random import randint
 import enum
 from high_scores import HighScores
@@ -129,6 +131,11 @@ def on_key_down(key):
         else:
             if key.name == "BACKSPACE":
                 player.name = player.name[:-1]
+    else:
+        if key == keys.F:
+            screen.surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
+        elif key == keys.W:
+            screen.surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
 def draw_high_score():
