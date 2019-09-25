@@ -1,5 +1,6 @@
 import pgzrun, math, time
 import pygame
+import text_utils
 
 from random import randint
 import enum
@@ -8,7 +9,6 @@ from high_scores import HighScores
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
 # TODO: Fix the "base" rocks to use texture that matches background better.
-# TODO: add ability to pause.
 # TODO: better pellet graphic and intersection.
 # TODO: refactor to use objects for state instead of globals
 
@@ -17,39 +17,10 @@ class GameStatus(enum.Enum):
     start = 0
     playing = 1
     over = 2
+    paused = 3
 
 
 # TODO: move to own file.
-# We need a way to show text screens between levels, for credits, etc.
-class TextScreen():
-    rows = []
-    centered = False
-    left = 0
-    top = 0
-    line_height = 0
-
-    def __init__(self, centered=False, left=100, top=300, line_height=60, rows=[]):
-        self.centered = centered
-        self.left = left
-        self.top = top
-        self.line_height = line_height
-        self.rows = [str(s) for s in rows]
-
-    def add_row(self, s):
-        self.rows.append(str(s))
-
-    def clear_rows(self):
-        self.rows = []
-
-    # TODO: handle color, style, font, etc.
-    def draw(self):
-        top = self.top
-        for row in self.rows:
-            if self.centered:
-                draw_string(row, midtop=(WIDTH/2,top))
-            else:
-                draw_string(row, left=self.left, top=top)
-            top += self.line_height
 
 
 player = Actor("timmy", (400, 550))
@@ -79,9 +50,11 @@ PLAYER_FINAL_STATUS = 30  # This is after death animation.
 def draw():
     screen.blit('cave', (0, 0))
     if gameStatus == GameStatus.start:
-        ts = TextScreen(
+        ts = text_utils.TextScreen(
+            screen=screen,
             top=100,
             centered=True,
+            screen_width=WIDTH,
             rows=[
                 "Timmy, Cave Dweller",
                 "",
@@ -92,7 +65,7 @@ def draw():
                 player.name
             ])
         ts.draw()
-    if gameStatus == GameStatus.playing:
+    if gameStatus == GameStatus.playing or gameStatus == GameStatus.paused:
         player.image = player.images[math.floor(player.status / 6)]
         player.draw()
         if boss.active:
@@ -100,27 +73,20 @@ def draw():
         draw_lasers()
         draw_aliens()
         draw_bases()
-        draw_string(str(score), topright=(WIDTH-20, 10))
-        draw_string("LEVEL " + str(level), midtop=(WIDTH/2, 10))
+        text_utils.draw_string(screen, str(score), topright=(WIDTH-20, 10))
+        text_utils.draw_string(screen, "LEVEL " + str(level), midtop=(WIDTH/2, 10))
         draw_lives()
         if player.status >= PLAYER_FINAL_STATUS:
             if player.lives > 0:
-                draw_centre_text("You were hit!\nPress Enter to re-spawn")
+                text_utils.draw_center_text(screen, "You were hit!\nPress Enter to re-spawn", screen_width=WIDTH)
             else:
-                draw_centre_text("GAME OVER!\nPress Enter to continue")
+                text_utils.draw_center_text(screen, "GAME OVER!\nPress Enter to continue", screen_width=WIDTH)
         if len(aliens) == 0:
-            draw_centre_text("Level Complete!\nPress Enter to go to the next level")
+            text_utils.draw_center_text(screen, "Level Complete!\nPress Enter to go to the next level", screen_width=WIDTH)
+        if gameStatus == GameStatus.paused:
+            text_utils.draw_center_text(screen, "PAUSED", screen_width=WIDTH, top=HEIGHT/3)
     if gameStatus == GameStatus.over:
         draw_high_score()
-
-
-def draw_string(s, **kwargs):
-    screen.draw.text(s, owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
-                     fontsize=60, **kwargs)
-
-
-def draw_centre_text(t):
-    draw_string(t, center=(WIDTH/2, 300))
 
 
 def update():
@@ -164,10 +130,12 @@ def update():
         if keyboard.ESCAPE:
             init()
             gameStatus = GameStatus.start
+    if gameStatus == GameStatus.paused:
+        pass # do nothing while paused.
 
 
 def on_key_down(key):
-    global player
+    global player, gameStatus
     if gameStatus == GameStatus.start and key.name != "RETURN":
         if len(key.name) == 1:
             player.name += key.name
@@ -175,6 +143,12 @@ def on_key_down(key):
             if key.name == "BACKSPACE":
                 player.name = player.name[:-1]
     else:
+        if key == key.P:
+            if gameStatus == GameStatus.playing:
+                gameStatus = GameStatus.paused
+            elif gameStatus == GameStatus.paused:
+                gameStatus = GameStatus.playing
+
         if key == keys.F:
             screen.surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
         elif key == keys.W:
@@ -190,7 +164,7 @@ def draw_high_score():
         if y < 400:
             screen.draw.text(line, fontsize=50, midtop=(WIDTH/2, 100 + y), ocolor=(0, 0, 255), color=(255, 255, 0))
             y += 50
-    draw_string("Press Escape to play again", center=(WIDTH/2, 550))
+    text_utils.draw_string(screen, "Press Escape to play again", center=(WIDTH/2, 550))
 
 
 def draw_lives():
@@ -242,6 +216,7 @@ def check_bases():
             bases[b].status = DEAD
     bases = list_cleanup(bases)
 
+
 def update_lasers():
     global lasers, aliens
     for l in range(len(lasers)):
@@ -277,7 +252,6 @@ def check_laser_hit(l):
         if collide_base_with_laser(bases[b], lasers[l]):
             bases[b].height = max(bases[b].height - 10, 0)
             lasers[l].status = DEAD
-
 
 
 def check_player_laser_hit(l):
@@ -371,7 +345,6 @@ def init():
     # For testing tone generation.
     # pellet_tone = tone.create(2000, 0.5)
     # pellet_tone.play()
-
 
     music.play("mystical_caverns")
 
