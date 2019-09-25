@@ -19,6 +19,39 @@ class GameStatus(enum.Enum):
     over = 2
 
 
+# TODO: move to own file.
+# We need a way to show text screens between levels, for credits, etc.
+class TextScreen():
+    rows = []
+    centered = False
+    left = 0
+    top = 0
+    line_height = 0
+
+    def __init__(self, centered=False, left=100, top=300, line_height=60, rows=[]):
+        self.centered = centered
+        self.left = left
+        self.top = top
+        self.line_height = line_height
+        self.rows = [str(s) for s in rows]
+
+    def add_row(self, s):
+        self.rows.append(str(s))
+
+    def clear_rows(self):
+        self.rows = []
+
+    # TODO: handle color, style, font, etc.
+    def draw(self):
+        top = self.top
+        for row in self.rows:
+            if self.centered:
+                draw_string(row, midtop=(WIDTH/2,top))
+            else:
+                draw_string(row, left=self.left, top=top)
+            top += self.line_height
+
+
 player = Actor("timmy", (400, 550))
 boss = Actor("spider")
 gameStatus = GameStatus.start
@@ -46,9 +79,19 @@ PLAYER_FINAL_STATUS = 30  # This is after death animation.
 def draw():
     screen.blit('cave', (0, 0))
     if gameStatus == GameStatus.start:
-        draw_centre_text(
-            "Timmy, Cave Dweller\n\n\nType your name then\nPress Enter to start\nArrow keys move. Space fires.")
-        draw_string(player.name, center=(WIDTH/2, 500))
+        ts = TextScreen(
+            top=100,
+            centered=True,
+            rows=[
+                "Timmy, Cave Dweller",
+                "",
+                "Type your name then",
+                "   press Enter to start",
+                "Arrow keys move. Space fires.",
+                "",
+                player.name
+            ])
+        ts.draw()
     if gameStatus == GameStatus.playing:
         player.image = player.images[math.floor(player.status / 6)]
         player.draw()
