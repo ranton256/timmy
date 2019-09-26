@@ -1,4 +1,4 @@
-import pgzrun, math, time
+import pgzrun, math
 import pygame
 import text_utils
 
@@ -6,12 +6,13 @@ from random import randint
 import enum
 from high_scores import HighScores
 
+
 # TODO: fix all the formatting and other warnings.
 # TODO: clean this all up to have fewer magic numbers and globals
 # TODO: Fix the "base" rocks to use texture that matches background better.
 # TODO: better pellet graphic and intersection.
 # TODO: refactor to use objects for state instead of globals
-
+# TODO: improve collision detection between timmy and rocks
 
 class GameStatus(enum.Enum):
     start = 0
@@ -20,16 +21,17 @@ class GameStatus(enum.Enum):
     paused = 3
 
 
-# TODO: move to own file.
-
-
 player = Actor("timmy", (400, 550))
 boss = Actor("spider")
 gameStatus = GameStatus.start
 highScore = []
 moveCounter = 0
+moveSequence = 0
+moveDelay = 0
 score = 0
 lasers = []
+aliens = []
+bases = []
 level = 1
 
 # These control the width in Pygame zero.
@@ -38,6 +40,9 @@ HEIGHT = 600
 PLAYER_MARGIN = 40
 
 ENEMY_MOVE_DELAY = 30
+
+BOSS_MARGIN = 100
+BOSS_KILL_Y = 500
 
 HIGH_SCORES_PATH = "highscores.txt"
 
@@ -74,8 +79,8 @@ def draw():
         draw_lasers()
         draw_aliens()
         draw_bases()
-        text_utils.draw_string(screen, str(score), topright=(WIDTH-20, 10))
-        text_utils.draw_string(screen, "LEVEL " + str(level), midtop=(WIDTH/2, 10))
+        text_utils.draw_string(screen, str(score), topright=(WIDTH - 20, 10))
+        text_utils.draw_string(screen, "LEVEL " + str(level), midtop=(WIDTH / 2, 10))
         draw_lives()
         if player.status >= PLAYER_FINAL_STATUS:
             if player.lives > 0:
@@ -83,9 +88,9 @@ def draw():
             else:
                 text_utils.draw_center_text(screen, "GAME OVER!\nPress Enter to continue", screen_width=WIDTH)
         if len(aliens) == 0:
-            text_utils.draw_center_text(screen, "Level Complete!\nPress Enter to go to the next level", screen_width=WIDTH)
+            text_utils.draw_center_text(screen, "Level Complete!\nPress Enter to begin next level", screen_width=WIDTH)
         if gameStatus == GameStatus.paused:
-            text_utils.draw_center_text(screen, "PAUSED", screen_width=WIDTH, top=HEIGHT/3)
+            text_utils.draw_center_text(screen, "PAUSED", screen_width=WIDTH, top=HEIGHT / 3)
     if gameStatus == GameStatus.over:
         draw_high_score()
 
@@ -93,7 +98,8 @@ def draw():
 def update():
     global moveCounter, player, gameStatus, lasers, level, boss, highScore
     if gameStatus == GameStatus.start:
-        if keyboard.RETURN and player.name != "": gameStatus = GameStatus.playing
+        if keyboard.RETURN and player.name != "":
+            gameStatus = GameStatus.playing
     if gameStatus == GameStatus.playing:
         if player.status < PLAYER_FINAL_STATUS and len(aliens) > 0:
             check_keys()
@@ -117,7 +123,7 @@ def update():
                     if len(aliens) == 0:
                         level += 1
                         boss.active = False
-                        init_aliens()
+                        init_enemies()
                         init_bases()
                 else:
                     scores = HighScores()
@@ -132,7 +138,7 @@ def update():
             init()
             gameStatus = GameStatus.start
     if gameStatus == GameStatus.paused:
-        pass # do nothing while paused.
+        pass  # do nothing while paused.
 
 
 def on_key_down(key):
@@ -159,13 +165,13 @@ def on_key_down(key):
 def draw_high_score():
     global highScore
     y = 0
-    screen.draw.text("High Scores", midtop=(WIDTH/2, 30), owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
+    screen.draw.text("High Scores", midtop=(WIDTH / 2, 30), owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
                      fontsize=60)
     for line in highScore:
         if y < 400:
-            screen.draw.text(line, fontsize=50, midtop=(WIDTH/2, 100 + y), ocolor=(0, 0, 255), color=(255, 255, 0))
+            screen.draw.text(line, fontsize=50, midtop=(WIDTH / 2, 100 + y), ocolor=(0, 0, 255), color=(255, 255, 0))
             y += 50
-    text_utils.draw_string(screen, "Press Escape to play again", center=(WIDTH/2, 550))
+    text_utils.draw_string(screen, "Press Escape to play again", center=(WIDTH / 2, 550))
 
 
 def draw_lives():
@@ -190,16 +196,16 @@ def draw_lasers():
 
 def check_keys():
     global player, score
-    if keyboard.left:
-        if player.x > PLAYER_MARGIN: player.x -= 5
-    if keyboard.right:
-        if player.x < (WIDTH - PLAYER_MARGIN): player.x += 5
+    if keyboard.left and player.x > PLAYER_MARGIN:
+        player.x -= 5
+    if keyboard.right and player.x < (WIDTH - PLAYER_MARGIN):
+        player.x += 5
     if keyboard.space:
         if player.laserActive == 1:
             sounds.pellet.play()
             player.laserActive = 0
             clock.schedule(make_laser_active, 1.0)
-            lasers.append(Actor("pellet", (player.x, player.y - 16))) # was 32
+            lasers.append(Actor("pellet", (player.x, player.y - 16)))  # was 32
             lasers[len(lasers) - 1].status = ALIVE
             lasers[len(lasers) - 1].type = 1
             score = max(score - 100, 0)
@@ -236,11 +242,11 @@ def update_lasers():
 
 
 def list_cleanup(l):
-    newList = []
+    new_list = []
     for i in range(len(l)):
         if l[i].status == ALIVE:
-            newList.append(l[i])
-    return newList
+            new_list.append(l[i])
+    return new_list
 
 
 def check_laser_hit(l):
@@ -274,16 +280,16 @@ def check_player_laser_hit(l):
 
 def update_aliens():
     global moveSequence, lasers, moveDelay
-    movex = movey = 0
+    move_x = move_y = 0
     if moveSequence < 10 or moveSequence > 30:
-        movex = -15
+        move_x = -15
     if moveSequence == 10 or moveSequence == 30:
-        movey = 40 + (5 * level)
+        move_y = 40 + (5 * level)
         moveDelay -= 1
     if 10 < moveSequence < 30:
-        movex = 15
+        move_x = 15
     for a in range(len(aliens)):
-        animate(aliens[a], pos=(aliens[a].x + movex, aliens[a].y + movey), duration=0.5, tween='linear')
+        animate(aliens[a], pos=(aliens[a].x + move_x, aliens[a].y + move_y), duration=0.5, tween='linear')
         if randint(0, 1) == 0:
             aliens[a].image = "batframe1"
         else:
@@ -298,7 +304,8 @@ def update_aliens():
             player.status = DEAD
             player.lives = 1  # TODO: waht? shouldn't this be -1
     moveSequence += 1
-    if moveSequence == 40: moveSequence = 0
+    if moveSequence == 40:
+        moveSequence = 0
 
 
 def update_boss():
@@ -309,10 +316,11 @@ def update_boss():
             boss.x -= (1 * level)
         else:
             boss.x += (1 * level)
-        # TODO: need constants
-        if boss.x < 100: boss.direction = 1
-        if boss.x > 700: boss.direction = 0
-        if boss.y > 500:
+        if boss.x < BOSS_MARGIN:
+            boss.direction = 1
+        if boss.x > (WIDTH - BOSS_MARGIN):
+            boss.direction = 0
+        if boss.y > BOSS_KILL_Y:
             sounds.explosion.play()
             player.status = DEAD
             boss.active = False
@@ -330,7 +338,7 @@ def update_boss():
 
 def init():
     global lasers, score, player, moveSequence, moveCounter, moveDelay, level, boss
-    init_aliens()
+    init_enemies()
     init_bases()
     moveCounter = moveSequence = score = player.laserCountdown = 0
     player.status = ALIVE
@@ -350,18 +358,17 @@ def init():
     music.play("mystical_caverns")
 
 
-def init_aliens():
+def init_enemies():
     global aliens, moveCounter, moveSequence
     aliens = []
     moveCounter = moveSequence = 0
     for a in range(18):
-        # TODO: OMG Constants!
         aliens.append(Actor("batframe1", (210 + (a % 6) * 80, 100 + (int(a / 6) * 64))))
         aliens[a].status = ALIVE
 
 
 def draw_clipped(self):
-    left = self.x -32
+    left = self.x - 32
     top = self.y - self.height
     r = (0, 0, self.width, self.height)
     screen.surface.blit(self._surf, (left, top), r)
