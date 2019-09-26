@@ -48,6 +48,7 @@ PLAYER_FINAL_STATUS = 30  # This is after death animation.
 
 
 def draw():
+    # draw background
     screen.blit('cave', (0, 0))
     if gameStatus == GameStatus.start:
         ts = text_utils.TextScreen(

@@ -2,7 +2,7 @@
 
 
 def draw_string(screen, s, **kwargs):
-    screen.draw.text(s, owidth=0.5, ocolor=(255, 255, 255), color=(0, 64, 255),
+    screen.draw.text(s, owidth=0.5, ocolor=(255, 255, 255), color=(0, 128, 128),
                      fontsize=60, **kwargs)
 
 
