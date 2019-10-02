@@ -10,9 +10,10 @@ class Level:
         self.rows = rows
         self.mobs = mobs
 
-    # TODO: this or its calling code isn't working.
     def roll_for_mob(self, mob_name):
         if mob_name in self.mobs:
             chances = int(self.mobs[mob_name]) or 0
-            return randint(chances, 10000) == 0
+            roll = randint(0, 10000)
+            if roll < chances:
+                return True
         return False

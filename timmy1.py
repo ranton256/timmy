@@ -55,7 +55,7 @@ levels = [
     levels.Level(1, {}),
     levels.Level(1, {'spider': 10}),
     levels.Level(2, {'spider': 20}),
-    levels.Level(3, {'spider': 30}),
+    levels.Level(3, {'spider': 40}),
 ]
 
 
@@ -336,7 +336,6 @@ def update_boss():
             lasers[len(lasers) - 1].status = ALIVE
             lasers[len(lasers) - 1].type = 0
     else:
-        #if randint(0, WIDTH) == 0:
         lobj = levels[(level - 1) % len(levels)]
         if lobj.roll_for_mob('spider'):
             boss.active = True
