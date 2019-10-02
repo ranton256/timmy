@@ -1,14 +1,12 @@
 import pgzrun, math
 import pygame
 import text_utils
+import levels
 
 from random import randint
 import enum
 from high_scores import HighScores
 
-
-# TODO: fix all the formatting and other warnings.
-# TODO: clean this all up to have fewer magic numbers and globals
 # TODO: Fix the "base" rocks to use texture that matches background better.
 # TODO: better pellet graphic and intersection.
 # TODO: refactor to use objects for state instead of globals
@@ -30,7 +28,7 @@ moveSequence = 0
 moveDelay = 0
 score = 0
 lasers = []
-aliens = []
+enemies = []
 bases = []
 level = 1
 
@@ -38,6 +36,8 @@ level = 1
 WIDTH = 800
 HEIGHT = 600
 PLAYER_MARGIN = 40
+
+ENEMIES_PER_ROW = 6
 
 ENEMY_MOVE_DELAY = 30
 
@@ -50,6 +50,13 @@ HIGH_SCORES_PATH = "highscores.txt"
 ALIVE = 0
 DEAD = 1
 PLAYER_FINAL_STATUS = 30  # This is after death animation.
+
+levels = [
+    levels.Level(1, {}),
+    levels.Level(1, {'spider': 10}),
+    levels.Level(2, {'spider': 20}),
+    levels.Level(3, {'spider': 30}),
+]
 
 
 def draw():
@@ -77,7 +84,7 @@ def draw():
         if boss.active:
             boss.draw()
         draw_lasers()
-        draw_aliens()
+        draw_enemies()
         draw_bases()
         text_utils.draw_string(screen, str(score), topright=(WIDTH - 20, 10))
         text_utils.draw_string(screen, "LEVEL " + str(level), midtop=(WIDTH / 2, 10))
@@ -87,7 +94,7 @@ def draw():
                 text_utils.draw_center_text(screen, "You were hit!\nPress Enter to re-spawn", screen_width=WIDTH)
             else:
                 text_utils.draw_center_text(screen, "GAME OVER!\nPress Enter to continue", screen_width=WIDTH)
-        if len(aliens) == 0:
+        if len(enemies) == 0:
             text_utils.draw_center_text(screen, "Level Complete!\nPress Enter to begin next level", screen_width=WIDTH)
         if gameStatus == GameStatus.paused:
             text_utils.draw_center_text(screen, "PAUSED", screen_width=WIDTH, top=HEIGHT / 3)
@@ -101,13 +108,13 @@ def update():
         if keyboard.RETURN and player.name != "":
             gameStatus = GameStatus.playing
     if gameStatus == GameStatus.playing:
-        if player.status < PLAYER_FINAL_STATUS and len(aliens) > 0:
+        if player.status < PLAYER_FINAL_STATUS and len(enemies) > 0:
             check_keys()
             update_lasers()
             update_boss()
             check_bases()
             if moveCounter == 0:
-                update_aliens()
+                update_enemies()
             moveCounter += 1
             if moveCounter == moveDelay:
                 moveCounter = 0
@@ -120,7 +127,7 @@ def update():
                 if player.lives > 0:
                     player.status = ALIVE
                     lasers = []
-                    if len(aliens) == 0:
+                    if len(enemies) == 0:
                         level += 1
                         boss.active = False
                         init_enemies()
@@ -179,9 +186,9 @@ def draw_lives():
         screen.blit("timmy_life", (10 + (l * 32), 10))
 
 
-def draw_aliens():
-    for a in range(len(aliens)):
-        aliens[a].draw()
+def draw_enemies():
+    for a in range(len(enemies)):
+        enemies[a].draw()
 
 
 def draw_bases():
@@ -225,7 +232,7 @@ def check_bases():
 
 
 def update_lasers():
-    global lasers, aliens
+    global lasers, enemies
     for l in range(len(lasers)):
         if lasers[l].type == 0:
             lasers[l].y += 2
@@ -238,7 +245,7 @@ def update_lasers():
             if lasers[l].y < 10:
                 lasers[l].status = DEAD
     lasers = list_cleanup(lasers)
-    aliens = list_cleanup(aliens)
+    enemies = list_cleanup(enemies)
 
 
 def list_cleanup(l):
@@ -266,10 +273,10 @@ def check_player_laser_hit(l):
     for b in range(len(bases)):
         if collide_base_with_laser(bases[b], lasers[l]):
             lasers[l].status = DEAD
-    for a in range(len(aliens)):
-        if aliens[a].collidepoint((lasers[l].x, lasers[l].y)):
+    for a in range(len(enemies)):
+        if enemies[a].collidepoint((lasers[l].x, lasers[l].y)):
             lasers[l].status = DEAD
-            aliens[a].status = DEAD
+            enemies[a].status = DEAD
             score += 1000
     if boss.active:
         if boss.collidepoint((lasers[l].x, lasers[l].y)):
@@ -278,7 +285,7 @@ def check_player_laser_hit(l):
             score += 5000
 
 
-def update_aliens():
+def update_enemies():
     global moveSequence, lasers, moveDelay
     move_x = move_y = 0
     if moveSequence < 10 or moveSequence > 30:
@@ -288,18 +295,18 @@ def update_aliens():
         moveDelay -= 1
     if 10 < moveSequence < 30:
         move_x = 15
-    for a in range(len(aliens)):
-        animate(aliens[a], pos=(aliens[a].x + move_x, aliens[a].y + move_y), duration=0.5, tween='linear')
+    for a in range(len(enemies)):
+        animate(enemies[a], pos=(enemies[a].x + move_x, enemies[a].y + move_y), duration=0.5, tween='linear')
         if randint(0, 1) == 0:
-            aliens[a].image = "batframe1"
+            enemies[a].image = "batframe1"
         else:
-            aliens[a].image = "batframe2"
+            enemies[a].image = "batframe2"
             if randint(0, 5) == 0:
-                lasers.append(Actor("batrock", (aliens[a].x, aliens[a].y)))
+                lasers.append(Actor("batrock", (enemies[a].x, enemies[a].y)))
                 lasers[len(lasers) - 1].status = ALIVE
                 lasers[len(lasers) - 1].type = ALIVE
                 sounds.batdrop.play()
-        if aliens[a].y > 500 and player.status == ALIVE:
+        if enemies[a].y > 500 and player.status == ALIVE:
             sounds.explosion.play()
             player.status = DEAD
             player.lives = 1  # TODO: waht? shouldn't this be -1
@@ -329,7 +336,9 @@ def update_boss():
             lasers[len(lasers) - 1].status = ALIVE
             lasers[len(lasers) - 1].type = 0
     else:
-        if randint(0, WIDTH) == 0:
+        #if randint(0, WIDTH) == 0:
+        lobj = levels[(level - 1) % len(levels)]
+        if lobj.roll_for_mob('spider'):
             boss.active = True
             boss.x = WIDTH
             boss.y = 100
@@ -359,12 +368,14 @@ def init():
 
 
 def init_enemies():
-    global aliens, moveCounter, moveSequence
-    aliens = []
+    global enemies, moveCounter, moveSequence, level
+    enemies = []
     moveCounter = moveSequence = 0
-    for a in range(18):
-        aliens.append(Actor("batframe1", (210 + (a % 6) * 80, 100 + (int(a / 6) * 64))))
-        aliens[a].status = ALIVE
+    lobj = levels[(level-1) % len(levels)]
+    n_enemies = ENEMIES_PER_ROW * lobj.rows
+    for a in range(n_enemies):
+        enemies.append(Actor("batframe1", (210 + (a % ENEMIES_PER_ROW) * 80, 100 + (int(a / ENEMIES_PER_ROW) * 64))))
+        enemies[a].status = ALIVE
 
 
 def draw_clipped(self):
