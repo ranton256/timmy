@@ -212,7 +212,7 @@ def check_keys():
             sounds.pellet.play()
             player.laserActive = 0
             clock.schedule(make_laser_active, 1.0)
-            lasers.append(Actor("pellet", (player.x, player.y - 16)))  # was 32
+            lasers.append(Actor("pellet", (player.x, player.y - 10)))  # was 32
             lasers[len(lasers) - 1].status = ALIVE
             lasers[len(lasers) - 1].type = 1
             score = max(score - 100, 0)
