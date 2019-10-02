@@ -394,7 +394,7 @@ def init_bases():
     bc = 0
     for b in range(3):
         for p in range(3):
-            bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 40), 520)))
+            bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 45), 520)))
             bases[bc].draw_clipped = draw_clipped.__get__(bases[bc])
             bases[bc].height = 44
             bases[bc].original_height = bases[bc].height
