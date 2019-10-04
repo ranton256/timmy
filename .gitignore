@@ -1,2 +1,6 @@
 /highscores.txt
 /Pipfile.lock
+dist
+build
+__pycache__/
+pgzero/__pycache__/

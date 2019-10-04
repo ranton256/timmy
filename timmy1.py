@@ -1,4 +1,10 @@
-import pgzrun, math
+# Don't use this in installer
+# TODO: detect this
+import os
+if not 'pyi' in os.environ:
+    import pgzrun
+
+import math
 import pygame
 import text_utils
 import levels
@@ -12,6 +18,7 @@ from high_scores import HighScores
 # TODO: refactor to use objects for state instead of globals
 # TODO: improve collision detection between timmy and rocks
 
+
 class GameStatus(enum.Enum):
     start = 0
     playing = 1
@@ -20,6 +27,7 @@ class GameStatus(enum.Enum):
 
 
 player = Actor("timmy", (400, 550))
+player.name = ""
 boss = Actor("spider")
 gameStatus = GameStatus.start
 highScore = []
@@ -59,10 +67,24 @@ levels = [
 ]
 
 
+TRACING=False
+def trc(s):
+    if TRACING:
+        print(s)
+
 def draw():
     # draw background
+    trc("center text")
+    screen.draw.text("testing", owidth=0.5, ocolor=(255, 255, 255), color=(0, 128, 128),
+                     fontsize=60, center=(WIDTH/2, 400))
+    # TODO: seems like text drawing crashes it with no error
+    # I suspect we are missing fonts or something in installer.
+    text_utils.draw_center_text(screen, "this is a test", screen_width=WIDTH)
+    trc("draw()") 
     screen.blit('cave', (0, 0))
+    trc("drew cave")
     if gameStatus == GameStatus.start:
+        trc("drawing text screen")
         ts = text_utils.TextScreen(
             screen=screen,
             top=100,
@@ -78,6 +100,7 @@ def draw():
                 player.name
             ])
         ts.draw()
+        trc("done with ts.draw()")
     if gameStatus == GameStatus.playing or gameStatus == GameStatus.paused:
         player.image = player.images[math.floor(player.status / 6)]
         player.draw()
@@ -100,9 +123,11 @@ def draw():
             text_utils.draw_center_text(screen, "PAUSED", screen_width=WIDTH, top=HEIGHT / 3)
     if gameStatus == GameStatus.over:
         draw_high_score()
+    trc("draw() done")
 
 
 def update():
+    trc("update()") 
     global moveCounter, player, gameStatus, lasers, level, boss, highScore
     if gameStatus == GameStatus.start:
         if keyboard.RETURN and player.name != "":
@@ -402,5 +427,9 @@ def init_bases():
             bc += 1
 
 
+trc("init")
 init()
-pgzrun.go()
+trc("done with init")
+# TODO: removed to work from pyinstaller
+if not 'pyi' in os.environ:
+    pgzrun.go()
