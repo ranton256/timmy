@@ -7,6 +7,7 @@
 - [ ] TODO: scrolling text about box screen
 - [ ] TODO: Make sure we have all the attributions in the about box credits.
 - [ ] TODO: write a README to distribute with the game, with also credits and attributions and instructions.
+- [ ] TODO: get the readme in the installer and open automatically after install somehow, or provide some way to show user where it is.
 - [ ] TODO: add a page on rastercat.com to promote the game(need to cleanup the other stuff on the site too).
 - [ ] TODO: share on itch.io
 - [ ] OPTIONAL: add falling glow worm mobs.
@@ -73,22 +74,23 @@ The original game design doc and notes were in this Google Doc:
 ## Attribution
 
 - Bat sprites based on these: https://opengameart.org/content/bat-sprite
-
-- Rocks (pelets, base) https://opengameart.org/content/a-bunch-of-rocks 
-
+  - No attribution instructions, but by [bagzie](https://opengameart.org/users/bagzie) and license is OGA-By-3.0, https://opengameart.org/content/oga-by-30-faq 
+  - http://static.opengameart.org/OGA-BY-3.0.txt
+- ~~Rocks (pelets, base) https://opengameart.org/content/a-bunch-of-rocks~~ 
 - - We replaced these.
-
 - Pistol: https://opengameart.org/content/flintlock-pistol 
 
   - If we redraw Timmy sprite again remove this.
-
+  - Copyrighted to DrzArt , but still free to use and modify , if it's used you have to gave the credit please :)
+  - https://opengameart.org/users/dreazer
 - Blood: https://opengameart.org/content/pixelated-blood-animations
-
+  - Just... don't lie and say you made this... cause you didn't (haha) These are free to use, go ahead. If you got the chance though, please mention us :) Or at least leave a like on facebook /sinestesiastudio or Instagram now :p /sinestesiaguy/
+  - [Sinestesia](https://opengameart.org/users/sinestesia)
 - Spider: https://opengameart.org/content/lpc-spider 
-
+  - Attribute Stephen "Redshrike" Challener as graphic artist and William.Thompsonj as contributor. If reasonable link to this page or the OGA homepage.
 - Music: https://opengameart.org/content/mystical-caverns 
-
-* Cave Tileset: https://opengameart.org/content/cave-tileset-0
-
+- Please credit MichaelTheCrow if used.
+- Cave Tileset: https://opengameart.org/content/cave-tileset-0
+  - Art by MrBeast. Commissioned by OpenGameArt.org (http://opengameart.org)
 
 
