@@ -1,6 +1,5 @@
-# Don't use this in installer
-# TODO: detect this
 import os
+# Don't use this when running from our installer wrapper.
 if not 'pyi' in os.environ:
     import pgzrun
 
@@ -13,8 +12,6 @@ from random import randint
 import enum
 from high_scores import HighScores
 
-# TODO: Fix the "base" rocks to use texture that matches background better.
-# TODO: better pellet graphic and intersection.
 # TODO: refactor to use objects for state instead of globals
 # TODO: improve collision detection between timmy and rocks
 
@@ -72,17 +69,11 @@ def trc(s):
     if TRACING:
         print(s)
 
+
 def draw():
     # draw background
-    trc("center text")
-    screen.draw.text("testing", owidth=0.5, ocolor=(255, 255, 255), color=(0, 128, 128),
-                     fontsize=60, center=(WIDTH/2, 400))
-    # TODO: seems like text drawing crashes it with no error
-    # I suspect we are missing fonts or something in installer.
-    text_utils.draw_center_text(screen, "this is a test", screen_width=WIDTH)
-    trc("draw()") 
+    trc("draw()")
     screen.blit('cave', (0, 0))
-    trc("drew cave")
     if gameStatus == GameStatus.start:
         trc("drawing text screen")
         ts = text_utils.TextScreen(
@@ -430,6 +421,5 @@ def init_bases():
 trc("init")
 init()
 trc("done with init")
-# TODO: removed to work from pyinstaller
 if not 'pyi' in os.environ:
     pgzrun.go()
