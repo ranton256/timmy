@@ -3,6 +3,15 @@ import os
 if not 'pyi' in os.environ:
     import pgzrun
 
+# Another way that doesn't require an environment variable
+""" 
+import sys
+if hasattr(sys, 'frozen') and getattr(sys, 'frozen') and hasattr(sys, '_MEIPASS'):
+    print('running in a PyInstaller bundle')
+else:
+    print('running in a normal Python process')
+"""
+
 import math
 import pygame
 import text_utils
@@ -17,12 +26,13 @@ class GameStatus(enum.Enum):
     playing = 1
     over = 2
     paused = 3
+    readme = 4
 
 
 player = Actor("timmy", (400, 550))
 player.name = ""
 boss = Actor("spider")
-gameStatus = GameStatus.start
+gameStatus = GameStatus.readme
 highScore = []
 moveCounter = 0
 moveSequence = 0
@@ -32,6 +42,8 @@ lasers = []
 enemies = []
 bases = []
 level = 1
+readme_screen = None
+readme_lines = []
 
 # These control the width in Pygame zero.
 WIDTH = 800
@@ -61,15 +73,31 @@ levels = [
 
 
 TRACING=False
+
+
 def trc(s):
     if TRACING:
         print(s)
 
 
 def draw():
+    global readme_lines, readme_screen
     # draw background
     trc("draw()")
     screen.blit('cave', (0, 0))
+    if gameStatus == GameStatus.readme:
+        text_utils.draw_string(screen, "Press Space to play", center=(WIDTH / 2, 550))
+        # TODO: draw readme_lines on screen, scroll
+        if readme_screen is None:
+            readme_screen = text_utils.TextScreen(
+                screen=screen,
+                top=100,
+                centered=True,
+                font_size=18,
+                screen_width=WIDTH,
+                rows=readme_lines)
+        readme_screen.draw()
+
     if gameStatus == GameStatus.start:
         trc("drawing text screen")
         ts = text_utils.TextScreen(
@@ -163,7 +191,9 @@ def update():
 
 def on_key_down(key):
     global player, gameStatus
-    if gameStatus == GameStatus.start and key.name != "RETURN":
+    if gameStatus == GameStatus.readme and key.name == "SPACE":
+        gameStatus = GameStatus.start
+    elif gameStatus == GameStatus.start and key.name != "RETURN":
         if len(key.name) == 1:
             player.name += key.name
         else:
@@ -357,10 +387,22 @@ def update_boss():
             boss.direction = 0
 
 
+def init_readme():
+    global readme_lines
+    readme_lines = []
+    try:
+        with open("README.md", encoding="latin-1") as f:
+            readme_lines = f.readlines()
+            # print(readme_lines)
+    except OSError as err:
+        print("Could not load README.md, OS error: {0}".format(err))
+
+
 def init():
     global lasers, score, player, moveSequence, moveCounter, moveDelay, level, boss
     init_enemies()
     init_bases()
+    init_readme()
     moveCounter = moveSequence = score = player.laserCountdown = 0
     player.status = ALIVE
     lasers = []

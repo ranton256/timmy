@@ -13,7 +13,7 @@
 - [ ] OPTIONAL: add falling glow worm mobs.
 - [ ] OPTIONAL: add different color bats that you have to shoot twice to die for harder levels.
 - [ ] OPTIONAL: add a rat mob boss that spits venom at you.
-- [ ] 
+- [ ] OPTIONAL: cleanup some of the installer hacks using https://pyinstaller.readthedocs.io/en/stable/hooks.html sys _MEIPASS and https://pythonhosted.org/PyInstaller/spec-files.html#using-data-files-from-a-module
 
 ## Overview
 

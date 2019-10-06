@@ -13,6 +13,16 @@ def draw_string(screen, s, **kwargs):
 def draw_center_text(screen, t, screen_width, top=300):
     draw_string(screen, t, center=(screen_width/2, top))
 
+""" TODO: You are here.
+def wrap_lines(lines, max=50):
+    wrapped_lines = []
+    for s in lines:
+        if len(s) > max:
+            words = s.split()
+            ns = ""
+            while len(words):
+"""
+
 
 # We need a way to show text screens between levels, for credits, etc.
 class TextScreen():
