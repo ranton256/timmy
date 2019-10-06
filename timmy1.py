@@ -12,10 +12,6 @@ from random import randint
 import enum
 from high_scores import HighScores
 
-# TODO: refactor to use objects for state instead of globals
-# TODO: improve collision detection between timmy and rocks
-
-
 class GameStatus(enum.Enum):
     start = 0
     playing = 1
@@ -80,6 +76,7 @@ def draw():
             screen=screen,
             top=100,
             centered=True,
+            font_size=36,
             screen_width=WIDTH,
             rows=[
                 "Timmy, Cave Dweller",

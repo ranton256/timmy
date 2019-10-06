@@ -14,7 +14,8 @@ a = Analysis(['timmy.py'],
                 ('text_utils.py', '.'),
                 ('high_scores.py', '.'),
                 ('levels.py', '.'),
-                ('timmy1.py', '.')
+                ('timmy1.py', '.'),
+                ('README.md', '.')
              ],
              hiddenimports=[],
              hookspath=[],
