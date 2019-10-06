@@ -29,22 +29,6 @@ class GameStatus(enum.Enum):
     readme = 4
 
 
-player = Actor("timmy", (400, 550))
-player.name = ""
-boss = Actor("spider")
-gameStatus = GameStatus.readme
-highScore = []
-moveCounter = 0
-moveSequence = 0
-moveDelay = 0
-score = 0
-lasers = []
-enemies = []
-bases = []
-level = 1
-readme_screen = None
-readme_lines = []
-
 # These control the width in Pygame zero.
 WIDTH = 800
 HEIGHT = 600
@@ -53,16 +37,38 @@ PLAYER_MARGIN = 40
 ENEMIES_PER_ROW = 6
 
 ENEMY_MOVE_DELAY = 30
+CREDITS_DELAY = 30
 
 BOSS_MARGIN = 100
 BOSS_KILL_Y = 500
 
 HIGH_SCORES_PATH = "highscores.txt"
 
+
 # These are actor status values.
 ALIVE = 0
 DEAD = 1
 PLAYER_FINAL_STATUS = 30  # This is after death animation.
+
+
+player = Actor("timmy", (400, 550))
+player.name = ""
+boss = Actor("spider")
+gameStatus = GameStatus.start  # TODO: readme
+highScore = []
+moveCounter = 0
+moveSequence = 0
+moveDelay = 0
+creditsDelay = CREDITS_DELAY
+creditsPage = 0
+score = 0
+lasers = []
+enemies = []
+bases = []
+level = 1
+readme_screen = None
+readme_lines = []
+
 
 levels = [
     levels.Level(1, {}),
@@ -81,21 +87,43 @@ def trc(s):
 
 
 def draw():
-    global readme_lines, readme_screen
+    global readme_lines, readme_screen, creditsDelay, creditsPage
     # draw background
     trc("draw()")
     screen.blit('cave', (0, 0))
     if gameStatus == GameStatus.readme:
         text_utils.draw_string(screen, "Press Space to play", center=(WIDTH / 2, 550))
-        # TODO: draw readme_lines on screen, scroll
+        # TODO: Finish this and do better scrolling!
+        top = 25
+        line_height = 18
+        max_lines = int((550 - top) / line_height) - 1
+        # print("max_lines = {}".format(max_lines))
+        page1 = readme_lines[:max_lines]
+        page2 = readme_lines[max_lines:]
+        page_lines = page1
+
+        # TODO: handle more than two pages
+        if creditsDelay == 0:
+            creditsDelay = CREDITS_DELAY
+            if creditsPage == 0:
+                creditsPage = 1
+            else:
+                creditsPage = 0
+            readme_screen = None  # new page
+        else:
+            creditsDelay = creditsDelay - 1
+        if creditsPage == 1:
+            page_lines = page2
         if readme_screen is None:
             readme_screen = text_utils.TextScreen(
                 screen=screen,
-                top=100,
-                centered=True,
+                top=top,
+                left=50,
+                centered=False,
                 font_size=18,
+                line_height=line_height,
                 screen_width=WIDTH,
-                rows=readme_lines)
+                rows=page_lines)
         readme_screen.draw()
 
     if gameStatus == GameStatus.start:
@@ -352,7 +380,7 @@ def update_enemies():
         if enemies[a].y > 500 and player.status == ALIVE:
             sounds.explosion.play()
             player.status = DEAD
-            player.lives = 1  # TODO: waht? shouldn't this be -1
+            player.lives = 1  # TODO: what? shouldn't this be -1
     moveSequence += 1
     if moveSequence == 40:
         moveSequence = 0
@@ -391,7 +419,7 @@ def init_readme():
     global readme_lines
     readme_lines = []
     try:
-        with open("README.md", encoding="latin-1") as f:
+        with open("README.txt", encoding="latin-1") as f:
             readme_lines = f.readlines()
             # print(readme_lines)
     except OSError as err:
