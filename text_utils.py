@@ -1,8 +1,8 @@
 # Text drawing and handling utilities.
 
 
-def draw_string_size(screen, s, font_size, **kwargs):
-    screen.draw.text(s, owidth=0.5, ocolor=(255, 255, 255), color=(0, 128, 128),
+def draw_string_size(screen, s, font_size, ocolor=(255, 255, 255), color=(0, 128, 128), **kwargs):
+    screen.draw.text(s, owidth=0.5, ocolor=ocolor, color=color,
                      fontsize=font_size, **kwargs)
 
 
@@ -33,8 +33,13 @@ class TextScreen():
     line_height = 0
     screen_width = None
     font_size = 60
+    ocolor = None
+    color = None
 
-    def __init__(self, screen, centered=False, screen_width=None, left=100, top=300, line_height=60, font_size=60, rows=[]):
+    def __init__(self, screen, centered=False, screen_width=None,
+                 left=100, top=300, line_height=60,
+                 font_size=60, ocolor=(255, 255, 255), color=(0, 128, 128),
+                 rows=[]):
         self.screen = screen
         self.centered = centered
         self.left = left
@@ -45,6 +50,8 @@ class TextScreen():
         self.screen_width = screen_width
         self.rows = [str(s) for s in rows]
         self.font_size = font_size
+        self.ocolor = ocolor
+        self.color = color
 
     def add_row(self, s):
         self.rows.append(str(s))
@@ -57,7 +64,7 @@ class TextScreen():
         top = self.top
         for row in self.rows:
             if self.centered:
-                draw_string_size(self.screen, row, self.font_size, midtop=(self.screen_width/2,top))
+                draw_string_size(self.screen, row, self.font_size, self.ocolor, self.color, midtop=(self.screen_width/2,top))
             else:
-                draw_string_size(self.screen, row, self.font_size, left=self.left, top=top)
+                draw_string_size(self.screen, row, self.font_size, self.ocolor, self.color, left=self.left, top=top)
             top += self.line_height

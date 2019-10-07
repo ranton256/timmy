@@ -37,7 +37,10 @@ PLAYER_MARGIN = 40
 ENEMIES_PER_ROW = 6
 
 ENEMY_MOVE_DELAY = 30
-CREDITS_DELAY = 30
+CREDITS_DELAY = 100
+README_LINE_HEIGHT = 18
+README_OCOLOR = (255, 255, 255)
+README_COLOR =  (0, 192, 255)
 
 BOSS_MARGIN = 100
 BOSS_KILL_Y = 500
@@ -54,7 +57,7 @@ PLAYER_FINAL_STATUS = 30  # This is after death animation.
 player = Actor("timmy", (400, 550))
 player.name = ""
 boss = Actor("spider")
-gameStatus = GameStatus.start  # TODO: readme
+gameStatus = GameStatus.readme
 highScore = []
 moveCounter = 0
 moveSequence = 0
@@ -67,8 +70,7 @@ enemies = []
 bases = []
 level = 1
 readme_screen = None
-readme_lines = []
-
+readme_pages = []
 
 levels = [
     levels.Level(1, {}),
@@ -87,42 +89,36 @@ def trc(s):
 
 
 def draw():
-    global readme_lines, readme_screen, creditsDelay, creditsPage
+    global readme_screen, readme_pages, creditsDelay, creditsPage
     # draw background
     trc("draw()")
     screen.blit('cave', (0, 0))
     if gameStatus == GameStatus.readme:
         text_utils.draw_string(screen, "Press Space to play", center=(WIDTH / 2, 550))
-        # TODO: Finish this and do better scrolling!
         top = 25
-        line_height = 18
-        max_lines = int((550 - top) / line_height) - 1
-        # print("max_lines = {}".format(max_lines))
-        page1 = readme_lines[:max_lines]
-        page2 = readme_lines[max_lines:]
-        page_lines = page1
+        line_height = README_LINE_HEIGHT
 
-        # TODO: handle more than two pages
         if creditsDelay == 0:
             creditsDelay = CREDITS_DELAY
-            if creditsPage == 0:
-                creditsPage = 1
-            else:
+            creditsPage = creditsPage + 1
+            if creditsPage == len(readme_pages):
                 creditsPage = 0
             readme_screen = None  # new page
         else:
             creditsDelay = creditsDelay - 1
-        if creditsPage == 1:
-            page_lines = page2
+        page_lines = readme_pages[creditsPage]
+
         if readme_screen is None:
             readme_screen = text_utils.TextScreen(
                 screen=screen,
                 top=top,
-                left=50,
+                left=25,
                 centered=False,
                 font_size=18,
                 line_height=line_height,
                 screen_width=WIDTH,
+                ocolor=README_OCOLOR,
+                color=README_COLOR,
                 rows=page_lines)
         readme_screen.draw()
 
@@ -416,7 +412,7 @@ def update_boss():
 
 
 def init_readme():
-    global readme_lines
+    global readme_pages
     readme_lines = []
     try:
         with open("README.txt", encoding="latin-1") as f:
@@ -424,6 +420,16 @@ def init_readme():
             # print(readme_lines)
     except OSError as err:
         print("Could not load README.md, OS error: {0}".format(err))
+    # split into screen size pages
+    pos = 0
+    line_height = README_LINE_HEIGHT
+    max_lines = int((HEIGHT - 100) / line_height) - 1
+    readme_pages = []
+    while pos < len(readme_lines):
+        this_page = readme_lines[pos:pos + max_lines]
+        readme_pages.append(this_page)
+        pos += max_lines
+    trc("Split into {} pages of {} lines each".format(len(readme_pages),max_lines))
 
 
 def init():
