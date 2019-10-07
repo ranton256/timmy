@@ -4,16 +4,16 @@
 
 - [ ] TODO: better Timmy sprite
 - [ ] TODO: better collision detection, or at least better bounding boxes.
-- [ ] TODO: scrolling text about box screen
-- [ ] TODO: Make sure we have all the attributions in the about box credits.
-- [ ] TODO: write a README to distribute with the game, with also credits and attributions and instructions.
-- [ ] TODO: get the readme in the installer and open automatically after install somehow, or provide some way to show user where it is.
-- [ ] TODO: add a page on rastercat.com to promote the game(need to cleanup the other stuff on the site too).
-- [ ] TODO: share on itch.io
+- [x] TODO: scrolling text about box screen
+- [x] TODO: Make sure we have all the attributions in the about box credits.
+- [x] TODO: write a README to distribute with the game, with also credits and attributions and instructions.
+- [ ] OPTIONAL: get the readme in the installer and open automatically after install somehow, or provide some way to show user where it is.
+- [ ] OPTIONAL: add a page on rastercat.com to promote the game(need to cleanup the other stuff on the site too).
 - [ ] OPTIONAL: add falling glow worm mobs.
 - [ ] OPTIONAL: add different color bats that you have to shoot twice to die for harder levels.
 - [ ] OPTIONAL: add a rat mob boss that spits venom at you.
 - [ ] OPTIONAL: cleanup some of the installer hacks using https://pyinstaller.readthedocs.io/en/stable/hooks.html sys _MEIPASS and https://pythonhosted.org/PyInstaller/spec-files.html#using-data-files-from-a-module
+- [ ] TODO: share on itch.io
 
 ## Overview
 
