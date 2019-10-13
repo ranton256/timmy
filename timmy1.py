@@ -54,7 +54,7 @@ DEAD = 1
 PLAYER_FINAL_STATUS = 30  # This is after death animation.
 
 
-player = Actor("timmy", (400, 550))
+player = Actor("timmy_redux", (400, 545))
 player.name = ""
 boss = Actor("spider")
 gameStatus = GameStatus.readme
@@ -142,7 +142,7 @@ def draw():
         ts.draw()
         trc("done with ts.draw()")
     if gameStatus == GameStatus.playing or gameStatus == GameStatus.paused:
-        player.image = player.images[math.floor(player.status / 6)]
+        player.image = player.images[min(2, math.floor(player.status / ((PLAYER_FINAL_STATUS) / 3)))]
         player.draw()
         if boss.active:
             boss.draw()
@@ -250,7 +250,7 @@ def draw_high_score():
 
 def draw_lives():
     for l in range(player.lives):
-        screen.blit("timmy_life", (10 + (l * 32), 10))
+        screen.blit("timmy_redux_life", (10 + (l * 22), 10))
 
 
 def draw_enemies():
@@ -279,7 +279,7 @@ def check_keys():
             sounds.pellet.play()
             player.laserActive = 0
             clock.schedule(make_laser_active, 1.0)
-            lasers.append(Actor("pellet", (player.x, player.y - 10)))  # was 32
+            lasers.append(Actor("pellet", (player.x, player.y - 40)))
             lasers[len(lasers) - 1].status = ALIVE
             lasers[len(lasers) - 1].type = 1
             score = max(score - 100, 0)
@@ -305,7 +305,7 @@ def update_lasers():
             lasers[l].y += 2
             check_laser_hit(l)
             if lasers[l].y > 600:
-                lasers[l].status = DEAD  # TODO: constant for height
+                lasers[l].status = DEAD
         if lasers[l].type == 1:
             lasers[l].y -= 5
             check_player_laser_hit(l)
@@ -442,7 +442,7 @@ def init():
     lasers = []
     moveDelay = ENEMY_MOVE_DELAY
     boss.active = False
-    player.images = ["timmy", "death1", "death2", "death3", "death4", "death5"]
+    player.images = ["timmy_redux", "death1", "death2"]
     player.laserActive = 1
     player.lives = 3
     player.name = ""
@@ -483,7 +483,7 @@ def init_bases():
     bc = 0
     for b in range(3):
         for p in range(3):
-            bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 45), 520)))
+            bases.append(Actor("baserock", midbottom=(150 + (b * 200) + (p * 45), 510)))
             bases[bc].draw_clipped = draw_clipped.__get__(bases[bc])
             bases[bc].height = 44
             bases[bc].original_height = bases[bc].height

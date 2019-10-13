@@ -33,10 +33,7 @@ https://opengameart.org/content/bat-sprite
   - by [bagzie](https://opengameart.org/users/bagzie), licensed as OGA-By-3.0, 
 https://opengameart.org/content/oga-by-30-faq 
   - http://static.opengameart.org/OGA-BY-3.0.txt
-- Timmy's pistol is based on this sprite 
-https://opengameart.org/content/flintlock-pistol 
-  - by DrzArt, https://opengameart.org/users/dreazer
-- Blood in the death animation based on 
+- Blood in the death animation based on
 https://opengameart.org/content/pixelated-blood-animations
   - by [Sinestesia](https://opengameart.org/users/sinestesia) on facebook 
 /sinestesiastudio or Instagram now :p /sinestesiaguy/

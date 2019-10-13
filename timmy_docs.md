@@ -80,7 +80,6 @@ The original game design doc and notes were in this Google Doc:
 - ~~Rocks (pelets, base) https://opengameart.org/content/a-bunch-of-rocks~~ 
 - - We replaced these.
 - Pistol: https://opengameart.org/content/flintlock-pistol 
-
   - If we redraw Timmy sprite again remove this.
   - Copyrighted to DrzArt , but still free to use and modify , if it's used you have to gave the credit please :)
   - https://opengameart.org/users/dreazer
