@@ -6,6 +6,9 @@ There are strange, aggressive bats. Fortunately, Tim, brought along his pellet p
 
 Help Timmy defend himself!
 
+![Screenshot](https://raw.githubusercontent.com/ranton256/timmy/main/timmy_screenshot1.png)
+
+
 ## Controls
 
 <space bar> - fire Timmy's  pellet gun
