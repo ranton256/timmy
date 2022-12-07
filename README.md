@@ -19,6 +19,11 @@ p - pause or unpause the game.
 
 f - switch the game to fullscreen mode
 
+## Binary Download
+
+You can download PyInstaller packaged binaries for Mac or Windows at:
+
+https://ranton.itch.io/timmy
 
 
 ## Credits
