@@ -30,9 +30,9 @@ Help Timmy defend himself!
 
 ## Technical Details
 
-The space invaders game we are basing this off of is a version of the same one we used for our coding class on Raspberry Pi and Python. This time we’re starting with their version two that ads scoring, lives, sound, and levels.
+The space invaders game we are basing this off of is a version of the same one we used for our coding class on Raspberry Pi and Python. This time we’re starting with their version two that adds scoring, lives, sound, and levels.
 
-It uses PyGame-Zero which is a game development library for Python, meant for Rapsberry Pi, but which also works on other computers.
+It uses PyGame-Zero which is a game development library for Python, meant for Raspberry Pi, but which also works on other computers.
 
 ## Installer
 
