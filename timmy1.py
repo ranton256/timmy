@@ -1,4 +1,5 @@
 import os
+
 # Don't use this when running from our installer wrapper.
 if not 'pyi' in os.environ:
     import pgzrun
@@ -21,6 +22,7 @@ from random import randint
 import enum
 from high_scores import HighScores
 
+
 class GameStatus(enum.Enum):
     start = 0
     playing = 1
@@ -40,19 +42,17 @@ ENEMY_MOVE_DELAY = 30
 CREDITS_DELAY = 100
 README_LINE_HEIGHT = 18
 README_OCOLOR = (255, 255, 255)
-README_COLOR =  (0, 192, 255)
+README_COLOR = (0, 192, 255)
 
 BOSS_MARGIN = 100
 BOSS_KILL_Y = 500
 
 HIGH_SCORES_PATH = "highscores.txt"
 
-
 # These are actor status values.
 ALIVE = 0
 DEAD = 1
 PLAYER_FINAL_STATUS = 30  # This is after death animation.
-
 
 player = Actor("timmy_redux", (400, 545))
 player.name = ""
@@ -79,8 +79,7 @@ levels = [
     levels.Level(3, {'spider': 40}),
 ]
 
-
-TRACING=False
+TRACING = False
 
 
 def trc(s):
@@ -167,7 +166,7 @@ def draw():
 
 
 def update():
-    trc("update()") 
+    trc("update()")
     global moveCounter, player, gameStatus, lasers, level, boss, highScore
     if gameStatus == GameStatus.start:
         if keyboard.RETURN and player.name != "":
@@ -429,7 +428,7 @@ def init_readme():
         this_page = readme_lines[pos:pos + max_lines]
         readme_pages.append(this_page)
         pos += max_lines
-    trc("Split into {} pages of {} lines each".format(len(readme_pages),max_lines))
+    trc("Split into {} pages of {} lines each".format(len(readme_pages), max_lines))
 
 
 def init():
@@ -459,7 +458,7 @@ def init_enemies():
     global enemies, moveCounter, moveSequence, level
     enemies = []
     moveCounter = moveSequence = 0
-    lobj = levels[(level-1) % len(levels)]
+    lobj = levels[(level - 1) % len(levels)]
     n_enemies = ENEMIES_PER_ROW * lobj.rows
     for a in range(n_enemies):
         enemies.append(Actor("batframe1", (210 + (a % ENEMIES_PER_ROW) * 80, 100 + (int(a / ENEMIES_PER_ROW) * 64))))
