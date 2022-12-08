@@ -16,7 +16,7 @@ left and right arrow keys - move Timmy left or right
 p - pause or unpause the game.
 f - switch the game to fullscreen mode
 
-By Richard Anton, Amy Anton, Emil Anton, Eric Anton, Jadyn Zeigler,
+By Richard Anton, Amy Anton, Emil Anton, Eric Anton, Faxon Zeigler,
 Makayla Zeigler, and Finn Anton
 
 For information on this software or to report bugs please visit
